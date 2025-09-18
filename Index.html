@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista de Tareas</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Tu CSS -->
+  <link rel="stylesheet" href="stylesheet.css">
+</head>
+<body class="bg-light">
+
+  <div class="container py-4">
+    <h1 class="mb-4 text-center">
+      <i class="bi bi-check2-square text-success"></i> Lista de Tareas
+    </h1>
+
+    <!-- Input y botón -->
+    <div class="input-group mb-3">
+      <input id="task-input" type="text" class="form-control" placeholder="Nueva tarea..." />
+      <button id="add-btn" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Agregar
+      </button>
+    </div>
+
+    <!-- Botones -->
+    <div class="mb-3 d-flex gap-2">
+      <button id="clear-done" class="btn btn-outline-danger">
+        <i class="bi bi-trash"></i> Eliminar completadas
+      </button>
+      <!-- Aquí se insertará el botón Reset con JS -->
+    </div>
+
+    <!-- Filtros -->
+    <div class="btn-group mb-3">
+      <button class="btn btn-outline-secondary active" data-filter="all">Todas</button>
+      <button class="btn btn-outline-secondary" data-filter="active">Activas</button>
+      <button class="btn btn-outline-secondary" data-filter="done">Completadas</button>
+    </div>
+
+    <!-- Contador -->
+    <div class="mb-3">
+      <span id="counter">0 tareas</span> |
+      Activas: <span id="stat-active">0</span> •
+      Completadas: <span id="stat-done">0</span> •
+      Total: <span id="stat-total">0</span>
+    </div>
+
+    <!-- Lista de tareas -->
+    <div id="list" class="row row-cols-1 row-cols-md-2 g-3"></div>
+
+    <!-- Vacío -->
+    <div id="empty" class="alert alert-info text-center">No hay tareas aún.</div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Tu script compilado -->
+  <script src="main.js"></script>
+</body>
+</html>
