@@ -1,47 +1,47 @@
-// ===== Estado =====
+// =========================
+// ====== ESTADO ===========
 const state = { tasks: [], filter: "all" };
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-// ===== Persistencia con localStorage =====
+// =========================
+// ====== LOCALSTORAGE =====
+// Guardar, cargar y limpiar tareas en almacenamiento local
 const STORAGE_KEY = "todo-app-tasks";
 
 function saveTasks() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
-  } catch { }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks)); } catch { }
 }
 
 function loadTasks() {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 function clearAllStorage() {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch { }
+  try { localStorage.removeItem(STORAGE_KEY); } catch { }
 }
 
-// ===== DOM =====
+// =========================
+// ====== REFERENCIAS DOM ==
 const $input = document.getElementById("task-input");
-const $addBtn = document.getElementById("add-btn");
+const $addBtn = document.getElementById("add-btn");       // BOTÓN ➝ Agregar
 const $list = document.getElementById("list");
 const $counter = document.getElementById("counter");
 const $empty = document.getElementById("empty");
-const $clearDone = document.getElementById("clear-done");
-const $filterButtons = Array.from(document.querySelectorAll("button[data-filter]"));
+const $clearDone = document.getElementById("clear-done"); // BOTÓN ➝ Borrar completadas
+const $filterButtons = Array.from(document.querySelectorAll("button[data-filter]")); // BOTONES ➝ Filtros (Todos / Activos / Completados)
 
 // Stats (opcionales)
 const $statActive = document.getElementById("stat-active");
 const $statDone = document.getElementById("stat-done");
 const $statTotal = document.getElementById("stat-total");
 
-// ===== CRUD =====
+// =========================
+// ====== CRUD DE TAREAS ===
 function addTask(title) {
+  // BOTÓN ➝ "Agregar tarea" (+ Enter en input)
   const trimmed = (title ?? "").trim();
   if (!trimmed) return;
   state.tasks.unshift({ id: uid(), title: trimmed, done: false, createdAt: Date.now() });
@@ -51,31 +51,33 @@ function addTask(title) {
 }
 
 function toggleTask(id) {
+  // CHECKBOX ➝ marcar / desmarcar completada
   state.tasks = state.tasks.map(t => (t.id === id ? { ...t, done: !t.done } : t));
   render();
 }
 
 function removeTask(id) {
+  // BOTÓN ➝ Eliminar (🗑️)
   state.tasks = state.tasks.filter(t => t.id !== id);
   render();
 }
 
 function clearDone() {
+  // BOTÓN ➝ "Borrar completadas"
   state.tasks = state.tasks.filter(t => !t.done);
   render();
 }
 
 function setFilter(f) {
+  // BOTONES ➝ Filtro (Todos, Activos, Completados)
   state.filter = f;
   render();
 }
 
 function viewTask(id) {
+  // BOTÓN ➝ Ver (👁️)
   const t = state.tasks.find(x => x.id === id);
-  if (!t) {
-    alert("No se encontró la tarea.");
-    return;
-  }
+  if (!t) { alert("No se encontró la tarea."); return; }
   const created = new Date(t.createdAt).toLocaleString();
   alert(
     `📄 Detalle de la tarea\n\n` +
@@ -87,24 +89,21 @@ function viewTask(id) {
 }
 
 function editTaskTitle(id) {
+  // BOTÓN ➝ Editar (✏️)
   const t = state.tasks.find(x => x.id === id);
-  if (!t) {
-    alert("No se encontró la tarea.");
-    return;
-  }
+  if (!t) { alert("No se encontró la tarea."); return; }
   const nuevo = prompt("Nuevo título para la tarea:", t.title);
   if (nuevo === null) return;
   const trimmed = nuevo.trim();
-  if (!trimmed) {
-    alert("El título no puede estar vacío.");
-    return;
-  }
+  if (!trimmed) { alert("El título no puede estar vacío."); return; }
   state.tasks = state.tasks.map(x => (x.id === id ? { ...x, title: trimmed } : x));
   render();
 }
 
-// ===== Reset total =====
+// =========================
+// ====== RESETEAR LISTA ===
 function resetAll() {
+  // BOTÓN ➝ Resetear lista (⚠️ Borra TODAS las tareas)
   const ok = confirm("¿Seguro que quieres borrar TODAS las tareas? Esta acción no se puede deshacer.");
   if (!ok) return;
   state.tasks = [];
@@ -112,7 +111,8 @@ function resetAll() {
   render();
 }
 
-// ===== Helpers =====
+// =========================
+// ====== HELPERS ==========
 function visibleTasks() {
   switch (state.filter) {
     case "active": return state.tasks.filter(t => !t.done);
@@ -122,6 +122,7 @@ function visibleTasks() {
 }
 
 function ensureResetButton() {
+  // Inserta el BOTÓN ➝ Resetear lista si no existe
   const existing = document.getElementById("reset-all");
   if (existing) return;
 
@@ -140,10 +141,12 @@ function ensureResetButton() {
   container.append(spacer, btn);
 }
 
-// ===== Render =====
+// =========================
+// ====== RENDER ===========
 function render() {
   const tasks = visibleTasks();
 
+  // Vacío / listado
   $empty.classList.toggle("d-none", tasks.length !== 0);
   $list.innerHTML = "";
 
@@ -155,6 +158,7 @@ function render() {
     card.className = "card h-100 shadow-sm";
     if (t.done) card.classList.add("border-success", "opacity-75");
 
+    // Encabezado ➝ CHECKBOX y título
     const header = document.createElement("div");
     header.className = "card-header bg-transparent d-flex align-items-center gap-2";
 
@@ -162,7 +166,6 @@ function render() {
     checkbox.type = "checkbox";
     checkbox.className = "form-check-input";
     checkbox.checked = t.done;
-    checkbox.title = "Marcar como completada / activa";
     checkbox.addEventListener("change", () => toggleTask(t.id));
 
     const title = document.createElement("div");
@@ -172,6 +175,7 @@ function render() {
 
     header.append(checkbox, title);
 
+    // Cuerpo ➝ fecha de creación
     const body = document.createElement("div");
     body.className = "card-body py-2";
     const meta = document.createElement("div");
@@ -179,20 +183,21 @@ function render() {
     meta.textContent = "Creada: " + new Date(t.createdAt).toLocaleString();
     body.appendChild(meta);
 
+    // Footer ➝ BOTONES (Ver, Editar, Eliminar)
     const footer = document.createElement("div");
     footer.className = "card-footer bg-transparent d-flex justify-content-end gap-2";
 
-    const viewBtn = document.createElement("button");
+    const viewBtn = document.createElement("button"); // BOTÓN ➝ Ver
     viewBtn.className = "btn btn-sm btn-outline-secondary";
     viewBtn.innerHTML = '<i class="bi bi-eye me-1"></i>Ver';
     viewBtn.addEventListener("click", () => viewTask(t.id));
 
-    const editBtn = document.createElement("button");
+    const editBtn = document.createElement("button"); // BOTÓN ➝ Editar
     editBtn.className = "btn btn-sm btn-outline-primary";
     editBtn.innerHTML = '<i class="bi bi-pencil-square me-1"></i>Editar';
     editBtn.addEventListener("click", () => editTaskTitle(t.id));
 
-    const removeBtn = document.createElement("button");
+    const removeBtn = document.createElement("button"); // BOTÓN ➝ Eliminar
     removeBtn.className = "btn btn-sm btn-outline-danger";
     removeBtn.innerHTML = '<i class="bi bi-trash3 me-1"></i>Eliminar';
     removeBtn.addEventListener("click", () => removeTask(t.id));
@@ -203,6 +208,7 @@ function render() {
     $list.appendChild(col);
   }
 
+  // Contadores
   const total = state.tasks.length;
   const done = state.tasks.filter(t => t.done).length;
   const active = total - done;
@@ -220,16 +226,18 @@ function render() {
   saveTasks();
 }
 
-// ===== Eventos =====
-$addBtn.addEventListener("click", () => addTask($input.value));
+// =========================
+// ====== EVENTOS ==========
+$addBtn.addEventListener("click", () => addTask($input.value)); // BOTÓN Agregar
 $input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") addTask($input.value);
+  if (e.key === "Enter") addTask($input.value); // ENTER ➝ Agregar
 });
-$clearDone.addEventListener("click", clearDone);
+$clearDone.addEventListener("click", clearDone); // BOTÓN Borrar completadas
 for (const b of $filterButtons) {
-  b.addEventListener("click", () => setFilter(b.dataset.filter ?? "all"));
+  b.addEventListener("click", () => setFilter(b.dataset.filter ?? "all")); // BOTONES Filtro
 }
 
+// Atajo teclado ➝ Ctrl+Shift+R ➝ Resetear lista
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === "r")) {
     e.preventDefault();
@@ -237,9 +245,11 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// ===== Inicialización =====
+// =========================
+// ====== INICIALIZACIÓN ===
 state.tasks = loadTasks();
 if (state.tasks.length === 0) {
+  // Tareas iniciales por defecto
   state.tasks = [
     { id: uid(), title: "Revisar JavaScript", done: true, createdAt: Date.now() - 60000 },
     { id: uid(), title: "Agregar validación", done: false, createdAt: Date.now() - 40000 },
